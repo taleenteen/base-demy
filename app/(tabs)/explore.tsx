@@ -1,112 +1,106 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { ThemedText } from "@/src/components/themed-text";
+import { IconSymbol } from "@/src/components/ui/icon-symbol";
+import { useConfigStore } from "@/src/store/useConfigStore";
+import { useRouter } from "expo-router";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+const TEST_URLS = [
+  {
+    name: "Volunteer e-Service",
+    url: "https://api-volunteer-eservice.govcenter.co",
+    description: "API testing endpoint for Volunteer e-Service",
+  },
+  {
+    name: "GovCenter Main",
+    url: "https://govcenter.co",
+    description: "Main landing page for GovCenter platform",
+  },
+  {
+    name: "Point Exchange",
+    url: "https://point-exchange.govcenter.co",
+    description: "Reward points exchange module",
+  },
+];
 
 export default function TabTwoScreen() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { currentUrl, setUrl } = useConfigStore();
+
+  const handleSelectUrl = (url: string) => {
+    setUrl(url);
+    router.navigate("/(tabs)");
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
+    <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
+      <View className="px-6 py-4 border-b border-border bg-card">
+        <ThemedText type="title" className="text-2xl font-bold mb-1">
+          Sandbox
         </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+        <Text className="text-muted-foreground">
+          Select a test environment to load in the WebView
+        </Text>
+      </View>
+
+      <ScrollView className="flex-1 px-4 py-6">
+        <View className="gap-4">
+          {TEST_URLS.map((item, index) => {
+            const isSelected = currentUrl === item.url;
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleSelectUrl(item.url)}
+                className={`p-4 rounded-xl border flex-row items-center justify-between ${
+                  isSelected
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-card"
+                }`}
+                activeOpacity={0.7}
+              >
+                <View className="flex-1 mr-4">
+                  <Text
+                    className={`text-lg font-semibold mb-1 ${
+                      isSelected ? "text-primary" : "text-foreground"
+                    }`}
+                  >
+                    {item.name}
+                  </Text>
+                  <Text className="text-muted-foreground text-sm mb-2">
+                    {item.description}
+                  </Text>
+                  <Text
+                    className="text-xs text-muted-foreground/80 font-mono"
+                    numberOfLines={1}
+                  >
+                    {item.url}
+                  </Text>
+                </View>
+
+                {isSelected ? (
+                  <View className="h-8 w-8 rounded-full bg-primary items-center justify-center">
+                    <IconSymbol name="checkmark" size={16} color="#fff" />
+                  </View>
+                ) : (
+                  <View className="h-8 w-8 items-center justify-center">
+                    <IconSymbol name="chevron.right" size={20} color="#888" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <View className="mt-8 p-4 bg-accent/30 rounded-lg border border-border">
+          <Text className="text-foreground font-semibold mb-2">
+            Current Target:
+          </Text>
+          <Text className="text-muted-foreground font-mono text-sm">
+            {currentUrl}
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});
