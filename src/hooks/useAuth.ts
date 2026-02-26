@@ -10,8 +10,8 @@ export const useAuth = () => {
   const isLoading = useAuthStore((state) => state.isLoading);
 
   const loginMutation = useMutation({
-    mutationFn: (credentials: { username: string; password: string }) =>
-      loginApi(credentials.username, credentials.password),
+    mutationFn: (credentials: { email: string; password: string }) =>
+      loginApi(credentials.email, credentials.password),
     onSuccess: async (data) => {
       await loginAction(data.token, data.user);
     },

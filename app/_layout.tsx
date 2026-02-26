@@ -35,12 +35,16 @@ function useProtectedRoute() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "login";
+    // @ts-ignore
+    const inEserviceGroup = segments[0] === "(eservice)";
 
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace("/login");
-    } else if (isAuthenticated && inAuthGroup) {
+    if (!isAuthenticated && inEserviceGroup) {
+      // If not authenticated and trying to access eservice, go to tabs (pre-login mode)
       router.replace("/(tabs)");
+    } else if (isAuthenticated && !inEserviceGroup) {
+      // If authenticated and nowhere near eservice, go to eservice home
+      // @ts-ignore
+      router.replace("/(eservice)");
     }
   }, [isAuthenticated, isLoading, segments, router]);
 }
@@ -54,7 +58,11 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="(eservice)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="login"
+            options={{ headerShown: false, presentation: "modal" }}
+          />
           <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}

@@ -1,11 +1,12 @@
 import { create } from "zustand";
-import { deleteToken, getToken, saveToken } from "../utils/storage";
-
-export interface User {
-  id: string;
-  username: string;
-  name?: string;
-}
+import { User } from "../types/auth";
+import {
+  clearAuth,
+  getToken,
+  getUser,
+  saveToken,
+  saveUser,
+} from "../utils/storage";
 
 interface AuthState {
   token: string | null;
@@ -25,24 +26,25 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (token: string, user: User) => {
     await saveToken(token);
+    await saveUser(user);
     set({ token, user, isAuthenticated: true });
   },
 
   logout: async () => {
-    await deleteToken();
+    await clearAuth();
     set({ token: null, user: null, isAuthenticated: false });
   },
 
   initialize: async () => {
     try {
       const token = await getToken();
-      if (token) {
-        // Here we would typically validate the token with the backend and fetch the user profile.
-        // For now, we mock a user since we skipped the backend phase.
+      const user = await getUser();
+
+      if (token && user) {
         set({
           token,
+          user: user as User,
           isAuthenticated: true,
-          user: { id: "1", username: "mockuser", name: "Mock User" },
         });
       }
     } catch (e) {
