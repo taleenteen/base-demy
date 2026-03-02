@@ -43,7 +43,7 @@ const TEST_URLS: TestUrl[] = [
   },
   {
     name: "DEMY e-Service",
-    url: "http://192.168.100.213:3001",
+    url: "http://192.168.100.219:3001",
     description: "DEMY e-Service",
     requiresAuth: true,
     ssoPath: "/sso",

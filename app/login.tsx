@@ -27,17 +27,28 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     setErrorMsg("");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("🚀 [LoginScreen] Login button pressed");
+    console.log(`📧 [LoginScreen] Email: ${email}`);
+
     if (!email || !password) {
+      console.log("⚠️ [LoginScreen] Validation failed: empty fields");
       setErrorMsg("Please enter both email and password.");
       return;
     }
 
     try {
+      console.log("⏳ [LoginScreen] Calling login API...");
       await login({ email, password });
+      console.log(
+        "🎉 [LoginScreen] Login completed! Navigation will be handled by auth guard.",
+      );
       // Navigation handled by auth guard
     } catch (error: any) {
+      console.log("❌ [LoginScreen] Login error caught:", error.message);
       setErrorMsg(error.message || "Invalid credentials");
     }
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   };
 
   return (

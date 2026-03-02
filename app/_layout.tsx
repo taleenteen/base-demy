@@ -9,6 +9,7 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { useColorScheme } from "@/src/hooks/use-color-scheme";
+import { usePushNotifications } from "@/src/hooks/usePushNotifications";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -52,6 +53,17 @@ function useProtectedRoute() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   useProtectedRoute();
+
+  // 🔔 Initialize push notification registration at root level
+  // This ensures registration happens once, regardless of which screen is shown.
+  const { expoPushToken } = usePushNotifications();
+
+  // Log token for debugging — can be viewed in terminal
+  useEffect(() => {
+    if (expoPushToken) {
+      console.log("🔔 Push Token ready:", expoPushToken);
+    }
+  }, [expoPushToken]);
 
   return (
     <QueryClientProvider client={queryClient}>
