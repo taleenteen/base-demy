@@ -7,9 +7,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Vibration,
   View,
 } from "react-native";
-import { WebView } from "react-native-webview";
+import { WebView, WebViewMessageEvent } from "react-native-webview";
 
 export default function EserviceHome() {
   const { token, logout } = useAuthStore();
@@ -37,14 +38,38 @@ export default function EserviceHome() {
     }
   };
 
-  const onMessage = (event: any) => {
+  const triggerVibration = (payload: { duration?: number; pattern?: number[] }) => {
+    if (Array.isArray(payload.pattern) && payload.pattern.length > 0) {
+      Vibration.vibrate(payload.pattern);
+      return;
+    }
+
+    const duration =
+      typeof payload.duration === "number" && payload.duration > 0
+        ? payload.duration
+        : 30;
+    Vibration.vibrate(duration);
+  };
+
+  const onMessage = (event: WebViewMessageEvent) => {
+    let data: { type?: string; action?: string; duration?: number; pattern?: number[] } = {};
+    const rawData = event.nativeEvent.data;
+
     try {
-      const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === "LOGOUT") {
-        logout();
-      }
-    } catch (error) {
-      console.error("Failed to parse webview message", error);
+      data = JSON.parse(rawData);
+    } catch {
+      data = { type: rawData };
+    }
+
+    const messageType = (data.type || data.action || "").toUpperCase();
+
+    if (messageType === "LOGOUT") {
+      logout();
+      return;
+    }
+
+    if (messageType === "VIBRATE" || messageType === "HAPTIC") {
+      triggerVibration(data);
     }
   };
 
